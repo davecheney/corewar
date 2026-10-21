@@ -10,7 +10,7 @@ const (
 	ColorDivider
 	ColorText
 	ColorTextDim
-	ColorTeal // text in the teal warrior's colour
+	ColorTeal // text in the left warrior's colour (blue)
 	ColorRed  // text in the red warrior's colour
 
 	rampTeal Color = 8 // first of RampLen shades, brightest first
@@ -35,12 +35,12 @@ func (c RGB) RGB565() uint16 {
 // Palette holds the colour of every Color.
 var Palette [NumColors]RGB
 
-// The two combatants share saturation and lightness and differ only in hue:
-// a light teal and the red that matches it.
+// Preserve the original teal ramp's blue-channel fade curve, scaled to
+// the Badge's 90% intensity, for both combatants.
 const (
-	hueTeal    = 174
-	hueRed     = 0
-	saturation = 0.82
+	hueTeal            = 174
+	saturation         = 0.82
+	combatantIntensity = 0xe6
 )
 
 // rampLightness runs from a near-white flash for an executed cell, through
@@ -49,19 +49,20 @@ var rampLightness = [RampLen]float64{0.88, 0.63, 0.54, 0.45, 0.37, 0.30, 0.24, 0
 
 func init() {
 	Palette[ColorBackground] = RGB{0, 0, 0}
-	Palette[ColorEmpty] = RGB{0x1c, 0x1e, 0x22}
+	Palette[ColorEmpty] = RGB{0x03, 0x03, 0x03}
 	Palette[ColorDivider] = RGB{0x40, 0x44, 0x48}
 	Palette[ColorText] = RGB{0xe8, 0xe8, 0xe8}
 	Palette[ColorTextDim] = RGB{0x88, 0x8c, 0x90}
-	Palette[ColorTeal] = hsl(hueTeal, saturation, rampLightness[1])
-	Palette[ColorRed] = hsl(hueRed, saturation, rampLightness[1])
+	Palette[ColorTeal] = RGB{B: combatantIntensity}
+	Palette[ColorRed] = RGB{R: combatantIntensity}
 	for i := range RampLen {
-		Palette[rampTeal+Color(i)] = hsl(hueTeal, saturation, rampLightness[i])
-		Palette[rampRed+Color(i)] = hsl(hueRed, saturation, rampLightness[i])
+		brightness := uint8(uint16(hsl(hueTeal, saturation, rampLightness[i]).B) * combatantIntensity / 0xff)
+		Palette[rampTeal+Color(i)] = RGB{B: brightness}
+		Palette[rampRed+Color(i)] = RGB{R: brightness}
 	}
 }
 
-// WarriorColor is the text colour of warrior w (0 teal, 1 red).
+// WarriorColor is the text colour of warrior w (0 blue, 1 red).
 func WarriorColor(w int) Color {
 	if w == 0 {
 		return ColorTeal

@@ -1,7 +1,7 @@
 # Core War demo
 
 A small, self-contained Core War / Redcode visualiser. Two built-in warriors
-fight in an endless best-of-three attract mode on a 320×240 display: teal on
+fight in an endless best-of-three attract mode on a 320×240 display: blue on
 the left and red on the right. The 8000-cell core occupies a 160×50 grid
 below the status bar. Recently written or executed core cells fade through an
 8-colour ramp.

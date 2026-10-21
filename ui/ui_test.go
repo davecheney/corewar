@@ -159,17 +159,24 @@ func TestFrameDoesNotAllocate(t *testing.T) {
 }
 
 func TestPalette(t *testing.T) {
-	teal, red := Palette[ColorTeal], Palette[ColorRed]
-	if teal.G <= teal.R || teal.B <= teal.R {
-		t.Errorf("teal = %+v", teal)
+	for c, want := range map[Color]RGB{
+		ColorEmpty: {3, 3, 3},
+		ColorTeal:  {0, 0, 230},
+		ColorRed:   {230, 0, 0},
+	} {
+		if got := Palette[c]; got != want {
+			t.Errorf("palette[%d] = %+v, want %+v", c, got, want)
+		}
 	}
-	if red.R <= red.G || red.G != red.B {
-		t.Errorf("red = %+v", red)
-	}
-	// Same saturation and lightness: the extremes of each sum match.
-	if int(max(teal.R, teal.G, teal.B))+int(min(teal.R, teal.G, teal.B)) !=
-		int(max(red.R, red.G, red.B))+int(min(red.R, red.G, red.B)) {
-		t.Errorf("teal %+v and red %+v differ in lightness", teal, red)
+	for i, brightness := range [...]uint8{220, 201, 193, 171, 140, 114, 91, 72} {
+		for c, want := range map[Color]RGB{
+			rampTeal + Color(i): {B: brightness},
+			rampRed + Color(i):  {R: brightness},
+		} {
+			if got := Palette[c]; got != want {
+				t.Errorf("palette[%d] = %+v, want %+v", c, got, want)
+			}
+		}
 	}
 }
 

@@ -21,29 +21,10 @@ import (
 
 const frameInterval = time.Second / 60
 
-// badgePalette uses pure blue and pure red for the combatants. It is kept in
-// the badge backend so the desktop retains its teal/red presentation.
-var badgePalette = func() [ui.NumColors]ui.RGB {
-	p := ui.Palette
-	p[ui.ColorEmpty] = ui.RGB{R: 0x03, G: 0x03, B: 0x03}
-	const combatantIntensity = 0xe6 // 90% of the ST7789 channel range
-	p[ui.ColorTeal] = ui.RGB{R: 0, G: 0, B: combatantIntensity}
-	p[ui.ColorRed] = ui.RGB{R: combatantIntensity, G: 0, B: 0}
-	for i := range ui.RampLen {
-		// Preserve the fade curve but cap its brightest shade at 90% too.
-		blue := ui.Color(8 + i)
-		red := blue + ui.RampLen
-		brightness := uint8(uint16(ui.Palette[blue].B) * combatantIntensity / 0xff)
-		p[blue] = ui.RGB{B: brightness}
-		p[red] = ui.RGB{R: brightness}
-	}
-	return p
-}()
-
 type display struct{ lcd *st7789.Device }
 
 func (d display) FillRect(x, y, w, h int, c ui.Color) {
-	rgb := badgePalette[c]
+	rgb := ui.Palette[c]
 	// Rectangle coordinates are already constrained by ui's 320x240 layout.
 	if err := d.lcd.FillRectangle(int16(x), int16(y), int16(w), int16(h),
 		color.RGBA{R: rgb.R, G: rgb.G, B: rgb.B, A: 0xff}); err != nil {
