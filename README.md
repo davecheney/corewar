@@ -18,6 +18,12 @@ brew install sdl3
 go run ./cmd/corewar
 ```
 
+TinyGo can also build the desktop. On Linux, add `-libc=glibc`, because the default musl build cannot find the system SDL3 headers and cannot link the system SDL3 library:
+
+```sh
+tinygo run -libc=glibc ./cmd/corewar
+```
+
 To pit your own warriors against each other, pass directories or files:
 
 ```sh

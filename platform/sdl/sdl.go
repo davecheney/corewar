@@ -11,6 +11,8 @@
 //   - The include path names SDL3's own directory so <SDL.h> resolves
 //     without putting /usr/include ahead of TinyGo's clang headers.
 //   - SDL_DISABLE_ARM_NEON_H keeps <arm_neon.h>, which TinyGo lacks, out.
+//   - On Linux, TinyGo needs -libc=glibc. Its default musl build cannot
+//     find the system SDL3 headers or link the glibc-built libSDL3.so.
 //
 // The window shows an INDEX8 streaming texture with SDL_SetTexturePalette,
 // so the ui.Buffer goes to the GPU as the one byte per pixel it already is.
